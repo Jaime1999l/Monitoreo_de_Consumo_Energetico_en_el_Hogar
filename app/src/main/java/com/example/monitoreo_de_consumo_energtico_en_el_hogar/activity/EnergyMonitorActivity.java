@@ -1,8 +1,9 @@
 package com.example.monitoreo_de_consumo_energtico_en_el_hogar.activity;
 
-
-
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
+import androidx.work.Data;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.monitoreo_de_consumo_energtico_en_el_hogar.R;
+import com.example.monitoreo_de_consumo_energtico_en_el_hogar.data.EnergyDataWorker;
 
 import java.util.Random;
 
@@ -28,11 +30,14 @@ public class EnergyMonitorActivity extends AppCompatActivity {
     private int totalElectrodomesticos = 0;
     private int totalCalefaccion = 0;
 
+    // Contador para generar tokens únicos
+    private static int tokenCounter = 1; // Inicializamos el contador
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_energy);
 
         // Inicializar las vistas
         textViewLuz = findViewById(R.id.textViewLuz);
@@ -77,6 +82,9 @@ public class EnergyMonitorActivity extends AppCompatActivity {
 
                 // Actualizar la UI
                 updateUI(luz, electrodomesticos, calefaccion);
+
+                // Enviar los datos a Firebase después de cada actualización
+                sendDataToWorker(luz, electrodomesticos, calefaccion);
 
                 // Reprogramar el runnable cada 6 segundos
                 handler.postDelayed(this, 6000);
@@ -132,6 +140,27 @@ public class EnergyMonitorActivity extends AppCompatActivity {
         } else {
             progressBar.getProgressDrawable().setColorFilter(getResources().getColor(android.R.color.holo_red_light), android.graphics.PorterDuff.Mode.SRC_IN);
         }
+    }
+
+    private void sendDataToWorker(int luz, int electrodomesticos, int calefaccion) {
+        // Crear un token único usando el contador
+        String token = "TOKEN_DATOS_" + tokenCounter++;
+
+        // Crear un objeto Data para pasar los valores al Worker
+        Data inputData = new Data.Builder()
+                .putInt("luz", luz)
+                .putInt("electrodomesticos", electrodomesticos)
+                .putInt("calefaccion", calefaccion)
+                .putString("token", token) // Pasar el token único
+                .build();
+
+        // Crear una solicitud de trabajo única para ejecutar el EnergyDataWorker con los datos
+        OneTimeWorkRequest workRequest = new OneTimeWorkRequest.Builder(EnergyDataWorker.class)
+                .setInputData(inputData) // Pasar los datos al Worker
+                .build();
+
+        // Enviar la solicitud de trabajo al WorkManager
+        WorkManager.getInstance(this).enqueue(workRequest);
     }
 
     @Override

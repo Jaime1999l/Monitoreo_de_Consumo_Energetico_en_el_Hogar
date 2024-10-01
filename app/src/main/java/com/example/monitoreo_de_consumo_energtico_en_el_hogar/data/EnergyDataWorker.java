@@ -1,56 +1,49 @@
 package com.example.monitoreo_de_consumo_energtico_en_el_hogar.data;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import androidx.annotation.NonNull;
-import androidx.work.Data;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
-
-import java.util.Random;
+import com.google.firebase.firestore.FirebaseFirestore;
+import java.util.HashMap;
+import java.util.Map;
 import android.util.Log;
 
 public class EnergyDataWorker extends Worker {
 
-    private static final String PREFS_NAME = "EnergyData";
-    private static final String KEY_LUZ = "luz";
-    private static final String KEY_ELECTRODOMESTICOS = "electrodomesticos";
-    private static final String KEY_CALefaccion = "calefaccion";
+    private FirebaseFirestore db;
 
     public EnergyDataWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
+        // Inicializar Firestore
+        db = FirebaseFirestore.getInstance();
     }
 
     @NonNull
     @Override
     public Result doWork() {
-        // Obtener SharedPreferences
-        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
+        // Obtener los datos pasados desde la Activity
+        int luz = getInputData().getInt("luz", 0);
+        int electrodomesticos = getInputData().getInt("electrodomesticos", 0);
+        int calefaccion = getInputData().getInt("calefaccion", 0);
+        String token = getInputData().getString("token"); // Obtener el token único
 
-        // Generar nuevos valores aleatorios
-        Random random = new Random();
-        int luz = random.nextInt(101); // Nuevo valor aleatorio de 0 a 100
-        int electrodomesticos = random.nextInt(101);
-        int calefaccion = random.nextInt(101);
+        // Crear un mapa de datos para guardar en Firestore
+        Map<String, Object> energyData = new HashMap<>();
+        energyData.put("luz", luz);
+        energyData.put("electrodomesticos", electrodomesticos);
+        energyData.put("calefaccion", calefaccion);
+        energyData.put("token", token); // Guardar el token
+        energyData.put("timestamp", System.currentTimeMillis());
 
-        // Guardar los nuevos valores
-        editor.putInt(KEY_LUZ, luz);
-        editor.putInt(KEY_ELECTRODOMESTICOS, electrodomesticos);
-        editor.putInt(KEY_CALefaccion, calefaccion);
-        editor.apply();
+        // Guardar los datos en Firestore en la colección 'energyUsage'
+        db.collection("energyUsage").document(token) // Usamos el token como ID del documento
+                .set(energyData)
+                .addOnSuccessListener(aVoid -> Log.d("EnergyDataWorker", "Datos guardados con éxito"))
+                .addOnFailureListener(e -> Log.e("EnergyDataWorker", "Error al guardar los datos", e));
 
-        // Log de los valores
-        Log.d("EnergyDataWorker", "Luz: " + luz + ", Electrodomésticos: " + electrodomesticos + ", Calefacción: " + calefaccion);
-
-        // Crear los datos de salida
-        Data outputData = new Data.Builder()
-                .putInt("luz", luz)
-                .putInt("electrodomesticos", electrodomesticos)
-                .putInt("calefaccion", calefaccion)
-                .build();
-
-        // Retornar los datos
-        return Result.success(outputData);
+        // Retornar el éxito del Worker
+        return Result.success();
     }
 }
+
