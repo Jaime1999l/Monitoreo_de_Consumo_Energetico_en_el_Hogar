@@ -32,7 +32,8 @@ android {
 }
 
 dependencies {
-
+    //noinspection GradleDependency
+    implementation("androidx.work:work-runtime-ktx:2.9.1")
     implementation(libs.appcompat)
     implementation(libs.material)
     testImplementation(libs.junit)
