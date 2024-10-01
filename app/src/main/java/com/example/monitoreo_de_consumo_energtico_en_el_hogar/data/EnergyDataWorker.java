@@ -1,4 +1,4 @@
-package com.example.Monitoreo_de_Consumo_Energetico_en_el_Hogar;
+package com.example.monitoreo_de_consumo_energtico_en_el_hogar.data;
 
 import android.content.Context;
 import android.content.SharedPreferences;

@@ -1,25 +1,154 @@
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent" android:layout_height="match_parent" tools:context="com.example.Monitoreo_de_Consumo_Energetico_en_el_Hogar.MainActivity">
-    <androidx.cardview.widget.CardView android:id="@+id/cardViewLuz" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_margin="16dp" android:background="@android:color/white" app:cardCornerRadius="8dp" app:cardElevation="4dp" app:layout_constraintTop_toTopOf="parent" app:layout_constraintLeft_toLeftOf="parent" app:layout_constraintRight_toRightOf="parent">
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
-            <ImageView android:id="@+id/imageViewLuz" android:layout_width="48dp" android:layout_height="48dp"/>
-            <TextView android:id="@+id/textViewLuz" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Luz: 0 kWh" android:textSize="18sp"/>
-            <ProgressBar android:id="@+id/progressBarLuz" style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:layout_height="wrap_content" android:max="120" android:progress="0" android:layout_marginTop="16dp"/>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.EnergyMonitorActivity">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardViewLuz"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:background="@android:color/white"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <ImageView
+                android:id="@+id/imageViewLuz"
+                android:layout_width="48dp"
+                android:layout_height="48dp" />
+
+            <TextView
+                android:id="@+id/textViewLuz"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Luz: 0 kWh"
+                android:textSize="18sp" />
+
+            <ProgressBar
+                android:id="@+id/progressBarLuz"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:max="120"
+                android:progress="0" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
-    <androidx.cardview.widget.CardView android:id="@+id/cardViewElectrodomesticos" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_margin="16dp" android:background="@android:color/white" app:cardCornerRadius="8dp" app:cardElevation="4dp" app:layout_constraintTop_toBottomOf="@id/cardViewLuz" app:layout_constraintLeft_toLeftOf="parent" app:layout_constraintRight_toRightOf="parent">
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
-            <ImageView android:id="@+id/imageViewElectrodomesticos" android:layout_width="48dp" android:layout_height="48dp"/>
-            <TextView android:id="@+id/textViewElectrodomesticos" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Electrodomésticos: 0 kWh" android:textSize="18sp"/>
-            <ProgressBar android:id="@+id/progressBarElectrodomesticos" style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:layout_height="wrap_content" android:max="120" android:progress="0" android:layout_marginTop="16dp"/>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardViewElectrodomesticos"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:background="@android:color/white"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cardViewLuz">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <ImageView
+                android:id="@+id/imageViewElectrodomesticos"
+                android:layout_width="48dp"
+                android:layout_height="48dp" />
+
+            <TextView
+                android:id="@+id/textViewElectrodomesticos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Electrodomésticos: 0 kWh"
+                android:textSize="18sp" />
+
+            <ProgressBar
+                android:id="@+id/progressBarElectrodomesticos"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:max="120"
+                android:progress="0" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
-    <androidx.cardview.widget.CardView android:id="@+id/cardViewCalefaccion" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_margin="16dp" android:background="@android:color/white" app:cardCornerRadius="8dp" app:cardElevation="4dp" app:layout_constraintTop_toBottomOf="@id/cardViewElectrodomesticos" app:layout_constraintLeft_toLeftOf="parent" app:layout_constraintRight_toRightOf="parent">
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
-            <ImageView android:id="@+id/imageViewCalefaccion" android:layout_width="48dp" android:layout_height="48dp"/>
-            <TextView android:id="@+id/textViewCalefaccion" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Calefacción: 0 kWh" android:textSize="18sp"/>
-            <ProgressBar android:id="@+id/progressBarCalefaccion" style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:layout_height="wrap_content" android:max="120" android:progress="0" android:layout_marginTop="16dp"/>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardViewCalefaccion"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:background="@android:color/white"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cardViewElectrodomesticos">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <ImageView
+                android:id="@+id/imageViewCalefaccion"
+                android:layout_width="48dp"
+                android:layout_height="48dp" />
+
+            <TextView
+                android:id="@+id/textViewCalefaccion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Calefacción: 0 kWh"
+                android:textSize="18sp" />
+
+            <ProgressBar
+                android:id="@+id/progressBarCalefaccion"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:max="120"
+                android:progress="0" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
-    <TextView android:id="@+id/textViewConsumoTotal" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Consumo Total: 0 kWh" android:textSize="18sp" android:layout_marginLeft="32dp" android:layout_marginRight="32dp" android:layout_marginTop="32dp" app:layout_constraintTop_toBottomOf="@id/cardViewCalefaccion" app:layout_constraintLeft_toLeftOf="parent"/>
-    <TextView android:id="@+id/textViewConsumoMedio" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Consumo Medio: 0 kWh" android:textSize="18sp" android:layout_marginLeft="32dp" android:layout_marginRight="32dp" android:layout_marginTop="16dp" app:layout_constraintTop_toBottomOf="@id/textViewConsumoTotal" app:layout_constraintLeft_toLeftOf="parent"/>
+
+    <TextView
+        android:id="@+id/textViewConsumoTotal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="32dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginRight="32dp"
+        android:text="Consumo Total: 0 kWh"
+        android:textSize="18sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cardViewCalefaccion" />
+
+    <TextView
+        android:id="@+id/textViewConsumoMedio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="32dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginRight="32dp"
+        android:text="Consumo Medio: 0 kWh"
+        android:textSize="18sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textViewConsumoTotal" />
 </androidx.constraintlayout.widget.ConstraintLayout>

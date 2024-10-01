@@ -10,7 +10,7 @@
         android:theme="@style/Theme.Monitoreo_de_Consumo_Energético_en_el_Hogar">
 
         <activity
-            android:name="com.example.Monitoreo_de_Consumo_Energetico_en_el_Hogar.MainActivity"
+            android:name=".activity.EnergyMonitorActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

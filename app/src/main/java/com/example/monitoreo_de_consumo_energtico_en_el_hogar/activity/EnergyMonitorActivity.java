@@ -1,4 +1,4 @@
-package com.example.Monitoreo_de_Consumo_Energetico_en_el_Hogar;
+package com.example.monitoreo_de_consumo_energtico_en_el_hogar.activity;
 
 
 
@@ -15,7 +15,7 @@ import com.example.monitoreo_de_consumo_energtico_en_el_hogar.R;
 
 import java.util.Random;
 
-public class MainActivity extends AppCompatActivity {
+public class EnergyMonitorActivity extends AppCompatActivity {
 
     private TextView textViewLuz, textViewElectrodomesticos, textViewCalefaccion, textViewConsumoTotal, textViewConsumoMedioTotal;
     private ProgressBar progressBarLuz, progressBarElectrodomesticos, progressBarCalefaccion;

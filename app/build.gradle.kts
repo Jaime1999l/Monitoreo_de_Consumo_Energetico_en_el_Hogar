@@ -36,6 +36,7 @@ dependencies {
     implementation("androidx.work:work-runtime-ktx:2.9.1")
     implementation(libs.appcompat)
     implementation(libs.material)
+    implementation(libs.work.runtime)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

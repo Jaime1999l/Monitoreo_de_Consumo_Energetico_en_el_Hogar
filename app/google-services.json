@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "924116075202",
+    "project_id": "monitoreo-de-consumo-63ba2",
+    "storage_bucket": "monitoreo-de-consumo-63ba2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:924116075202:android:af6c9d936d4fb754e2f15b",
+        "android_client_info": {
+          "package_name": "com.example.monitoreo_de_consumo_energtico_en_el_hogar"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAKKZZlCkqq26bxrZLESelfk9I1MK45bwU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
