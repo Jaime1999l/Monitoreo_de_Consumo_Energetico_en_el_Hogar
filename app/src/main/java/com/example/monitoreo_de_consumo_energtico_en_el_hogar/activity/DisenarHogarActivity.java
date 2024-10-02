@@ -14,6 +14,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -26,6 +27,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 
 public class DisenarHogarActivity extends AppCompatActivity {
@@ -124,6 +126,7 @@ public class DisenarHogarActivity extends AppCompatActivity {
         builder.show();
     }
 
+    @SuppressLint("SetTextI18n")
     private void mostrarDialogoNuevoPasillo() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Nuevo Pasillo");
@@ -192,7 +195,8 @@ public class DisenarHogarActivity extends AppCompatActivity {
         mapaHabitaciones.put(habitacionLayout, habitacion);
 
         habilitarRedimensionadoYMovimiento(habitacionLayout, habitacion);
-        mostrarDatosHabitacion(habitacion);
+
+        mostrarDatosHabitacion();
 
         habitacionLayout.setOnTouchListener((v, event) -> {
             layoutSeleccionado = habitacionLayout;
@@ -282,7 +286,7 @@ public class DisenarHogarActivity extends AppCompatActivity {
 
     private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
         @Override
-        public boolean onScale(ScaleGestureDetector detector) {
+        public boolean onScale(@NonNull ScaleGestureDetector detector) {
             if (layoutSeleccionado != null) {
                 float scaleFactor = detector.getScaleFactor();
                 int newWidth = Math.max(MIN_WIDTH_HEIGHT, (int) (layoutSeleccionado.getWidth() * scaleFactor));
@@ -294,12 +298,12 @@ public class DisenarHogarActivity extends AppCompatActivity {
 
                 if (mapaHabitaciones.containsKey(layoutSeleccionado)) {
                     Habitacion habitacion = mapaHabitaciones.get(layoutSeleccionado);
-                    habitacion.setAncho(newWidth);
+                    Objects.requireNonNull(habitacion).setAncho(newWidth);
                     habitacion.setAlto(newHeight);
                     guardarHabitacionEnFirebase(habitacion);
                 } else if (mapaPasillos.containsKey(layoutSeleccionado)) {
                     Pasillo pasillo = mapaPasillos.get(layoutSeleccionado);
-                    pasillo.setAncho(newWidth);
+                    Objects.requireNonNull(pasillo).setAncho(newWidth);
                     pasillo.setAlto(newHeight);
                     guardarPasilloEnFirebase(pasillo);
                 }
@@ -308,10 +312,25 @@ public class DisenarHogarActivity extends AppCompatActivity {
         }
     }
 
-    private void mostrarDatosHabitacion(Habitacion habitacion) {
-        TextView datosHabitacion = new TextView(this);
-        datosHabitacion.setText("Habitación: " + habitacion.getNombre() + " - Consumo: " + habitacion.getConsumoEnergetico() + " kWh");
-        layoutDatosHabitaciones.addView(datosHabitacion);
+    @SuppressLint("SetTextI18n")
+    private void mostrarDatosHabitacion() {
+        layoutDatosHabitaciones.removeAllViews();  // Limpia antes de agregar los datos actualizados
+        TextView titulo = new TextView(this);
+        titulo.setText("Datos de consumo de las habitaciones: \n");
+        titulo.setTextSize(18);
+        titulo.setTextColor(Color.BLACK);
+        titulo.setGravity(Gravity.START);
+        titulo.setPadding(0, 0, 0, 10);
+        layoutDatosHabitaciones.addView(titulo);
+
+        // Agregar los datos de habitaciones actualizados
+        for (Habitacion habitacion : habitaciones) {
+            TextView datosHabitacion = new TextView(this);
+            datosHabitacion.setText("Habitación: " + habitacion.getNombre() + " - Consumo: " + habitacion.getConsumoEnergetico() + " kWh");
+            datosHabitacion.setTextColor(Color.BLACK);
+            datosHabitacion.setTextSize(16);
+            layoutDatosHabitaciones.addView(datosHabitacion);
+        }
     }
 
     private void guardarHabitacionEnFirebase(Habitacion habitacion) {
@@ -366,6 +385,7 @@ public class DisenarHogarActivity extends AppCompatActivity {
                         agregarHabitacionVisual(habitacion);
                     }
                 }
+                mostrarDatosHabitacion();  // Llamamos a la actualización de datos después de cargar las habitaciones
             }
         });
 
@@ -404,6 +424,7 @@ public class DisenarHogarActivity extends AppCompatActivity {
                     habitacion.setConsumoEnergetico(generarConsumoSimulado());
                     guardarHabitacionEnFirebase(habitacion);
                 }
+                mostrarDatosHabitacion();  // Llamamos a la actualización de datos en pantalla después de actualizar el consumo
                 handler.postDelayed(this, 5000);
             }
         };
@@ -415,5 +436,6 @@ public class DisenarHogarActivity extends AppCompatActivity {
         return random.nextInt(500) + 100;
     }
 }
+
 
 

@@ -18,13 +18,13 @@
             android:id="@+id/btn_agregar_habitacion"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Agregar Habitación" />
+            android:text="@string/habitaci_n" />
 
         <Button
             android:id="@+id/btn_agregar_pasillo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Agregar Pasillo"
+            android:text="@string/pasillo"
             android:layout_marginStart="16dp" />
 
     </LinearLayout>
@@ -56,7 +56,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Datos de las habitaciones y pasillos:"
+                android:text="@string/datos_de_consumo_de_las_habitaciones"
                 android:textStyle="bold" />
 
             <!-- Aquí se añadirán dinámicamente los datos de habitaciones y pasillos -->
