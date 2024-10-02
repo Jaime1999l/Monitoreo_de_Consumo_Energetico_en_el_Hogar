@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Botones para agregar habitaciones y pasillos -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_marginBottom="16dp">
+
+        <Button
+            android:id="@+id/btn_agregar_habitacion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/habitaci_n" />
+
+        <Button
+            android:id="@+id/btn_agregar_pasillo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/pasillo"
+            android:layout_marginStart="16dp" />
+
+    </LinearLayout>
+
+    <!-- Layout donde se dibujarán las habitaciones y pasillos -->
+    <FrameLayout
+        android:id="@+id/layout_hogar"
+        android:layout_width="match_parent"
+        android:layout_height="600dp"
+        android:background="#f0f0f0"
+        android:layout_gravity="center"
+        android:layout_marginBottom="16dp">
+    </FrameLayout>
+
+    <!-- ScrollView para datos de las habitaciones y pasillos -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:id="@+id/layout_datos_habitaciones"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp"
+            android:background="#E0E0E0">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/datos_de_consumo_de_las_habitaciones"
+                android:textStyle="bold" />
+
+            <!-- Aquí se añadirán dinámicamente los datos de habitaciones y pasillos -->
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>
+
+

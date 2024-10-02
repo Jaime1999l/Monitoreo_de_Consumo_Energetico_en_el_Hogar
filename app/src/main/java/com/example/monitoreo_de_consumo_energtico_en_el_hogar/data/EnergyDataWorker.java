@@ -33,7 +33,7 @@ public class EnergyDataWorker extends Worker {
         energyData.put("luz", luz);
         energyData.put("electrodomesticos", electrodomesticos);
         energyData.put("calefaccion", calefaccion);
-        energyData.put("token", token); // Guardar el token
+        energyData.put("token", token);
         energyData.put("timestamp", System.currentTimeMillis());
 
         // Guardar los datos en Firestore en la colección 'energyUsage'
