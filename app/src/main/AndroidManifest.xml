@@ -11,6 +11,10 @@
 
         <activity
             android:name=".activity.EnergyMonitorActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".activity.DisenarHogarActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
