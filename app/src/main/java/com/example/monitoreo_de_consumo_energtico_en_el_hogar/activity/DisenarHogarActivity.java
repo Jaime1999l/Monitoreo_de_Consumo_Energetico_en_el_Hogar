@@ -3,6 +3,7 @@ package com.example.monitoreo_de_consumo_energtico_en_el_hogar.activity;
 import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -15,12 +16,8 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.work.Data;
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkManager;
 
 import com.example.monitoreo_de_consumo_energtico_en_el_hogar.R;
-import com.example.monitoreo_de_consumo_energtico_en_el_hogar.data.HomeDataWorker;
 import com.example.monitoreo_de_consumo_energtico_en_el_hogar.domain.Habitacion;
 import com.example.monitoreo_de_consumo_energtico_en_el_hogar.domain.Pasillo;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -42,9 +39,9 @@ public class DisenarHogarActivity extends AppCompatActivity {
     private ScaleGestureDetector scaleGestureDetector;
     private FirebaseFirestore db;
     private int colorSeleccionado = Color.TRANSPARENT;
-    private FrameLayout layoutSeleccionado; // Para saber qué layout está seleccionado para escalar o mover
+    private FrameLayout layoutSeleccionado;
     private static final int MIN_WIDTH_HEIGHT = 150;
-    private float dX, dY; // Para mover el layout
+    private float dX, dY;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -66,14 +63,9 @@ public class DisenarHogarActivity extends AppCompatActivity {
         findViewById(R.id.btn_agregar_pasillo).setOnClickListener(v -> mostrarDialogoNuevoPasillo());
 
         cargarElementosDesdeFirebase();
-
-        layoutHogar.setOnTouchListener((v, event) -> {
-            scaleGestureDetector.onTouchEvent(event);
-            return true;
-        });
+        iniciarActualizacionConsumo();
     }
 
-    // Diálogo para agregar una nueva habitación
     private void mostrarDialogoNuevaHabitacion() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Nueva Habitación");
@@ -90,7 +82,7 @@ public class DisenarHogarActivity extends AppCompatActivity {
         coloresLayout.setGravity(Gravity.CENTER);
         coloresLayout.setPadding(0, 20, 0, 20);
 
-        int[] colores = { Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.MAGENTA, Color.CYAN };
+        int[] colores = {Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.MAGENTA, Color.CYAN};
 
         Button[] botonesColores = new Button[colores.length];
 
@@ -124,7 +116,7 @@ public class DisenarHogarActivity extends AppCompatActivity {
                 Habitacion nuevaHabitacion = new Habitacion(nombreHabitacion, generarConsumoSimulado(), colorHex);
                 habitaciones.add(nuevaHabitacion);
                 agregarHabitacionVisual(nuevaHabitacion);
-                enviarDatosHabitacionAWorker(nuevaHabitacion);
+                guardarHabitacionEnFirebase(nuevaHabitacion);
             }
         });
         builder.setNegativeButton("Cancelar", (dialog, which) -> dialog.cancel());
@@ -132,7 +124,6 @@ public class DisenarHogarActivity extends AppCompatActivity {
         builder.show();
     }
 
-    // Diálogo para agregar un nuevo pasillo
     private void mostrarDialogoNuevoPasillo() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Nuevo Pasillo");
@@ -144,14 +135,13 @@ public class DisenarHogarActivity extends AppCompatActivity {
         EditText inputNombre = new EditText(this);
         inputNombre.setHint("Nombre del pasillo");
 
-        // Botones para elegir la orientación del pasillo
         Button btnHorizontal = new Button(this);
         btnHorizontal.setText("Horizontal");
 
         Button btnVertical = new Button(this);
         btnVertical.setText("Vertical");
 
-        final boolean[] esHorizontal = {true}; // Por defecto, horizontal
+        final boolean[] esHorizontal = {true};
 
         btnHorizontal.setOnClickListener(v -> esHorizontal[0] = true);
         btnVertical.setOnClickListener(v -> esHorizontal[0] = false);
@@ -170,7 +160,7 @@ public class DisenarHogarActivity extends AppCompatActivity {
                 Pasillo nuevoPasillo = new Pasillo(nombrePasillo, ancho, alto, "#A9A9A9", esHorizontal[0]);
                 pasillos.add(nuevoPasillo);
                 agregarPasilloVisual(nuevoPasillo);
-                enviarDatosPasilloAWorker(nuevoPasillo);
+                guardarPasilloEnFirebase(nuevoPasillo);
             }
         });
         builder.setNegativeButton("Cancelar", (dialog, which) -> dialog.cancel());
@@ -183,15 +173,7 @@ public class DisenarHogarActivity extends AppCompatActivity {
         FrameLayout habitacionLayout = new FrameLayout(this);
 
         String colorString = habitacion.getColor();
-        if (colorString.isEmpty()) {
-            habitacionLayout.setBackgroundColor(Color.WHITE);
-        } else {
-            try {
-                habitacionLayout.setBackgroundColor(Color.parseColor(colorString));
-            } catch (IllegalArgumentException e) {
-                habitacionLayout.setBackgroundColor(Color.WHITE);
-            }
-        }
+        habitacionLayout.setBackgroundColor(Color.parseColor(colorString));
 
         habitacionLayout.setId(View.generateViewId());
 
@@ -203,21 +185,21 @@ public class DisenarHogarActivity extends AppCompatActivity {
         habitacionLayout.addView(nombreHabitacion);
 
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(300, 300);
-        params.leftMargin = 50;
-        params.topMargin = 50;
+        params.leftMargin = habitacion.getPosX();
+        params.topMargin = habitacion.getPosY();
         habitacionLayout.setLayoutParams(params);
         layoutHogar.addView(habitacionLayout);
         mapaHabitaciones.put(habitacionLayout, habitacion);
 
-        habilitarRedimensionadoYMovimiento(habitacionLayout);
+        habilitarRedimensionadoYMovimiento(habitacionLayout, habitacion);
         mostrarDatosHabitacion(habitacion);
 
         habitacionLayout.setOnTouchListener((v, event) -> {
             layoutSeleccionado = habitacionLayout;
             if (!scaleGestureDetector.isInProgress()) {
-                moverLayoutConUnDedo(v, event); // Movimiento con un dedo
+                moverLayoutConUnDedo(v, event, habitacion);
             }
-            scaleGestureDetector.onTouchEvent(event); // Redimensionar con dos dedos
+            scaleGestureDetector.onTouchEvent(event);
             return true;
         });
     }
@@ -226,16 +208,7 @@ public class DisenarHogarActivity extends AppCompatActivity {
     private void agregarPasilloVisual(Pasillo pasillo) {
         FrameLayout pasilloLayout = new FrameLayout(this);
 
-        String colorString = pasillo.getColor();
-        if (colorString == null || colorString.isEmpty()) {
-            colorString = "#A9A9A9"; // Color gris oscuro por defecto
-        }
-
-        try {
-            pasilloLayout.setBackgroundColor(Color.parseColor(colorString));
-        } catch (IllegalArgumentException e) {
-            pasilloLayout.setBackgroundColor(Color.GRAY); // Si el color no es válido, usa un gris por defecto
-        }
+        pasilloLayout.setBackgroundColor(Color.parseColor(pasillo.getColor()));
 
         pasilloLayout.setId(View.generateViewId());
 
@@ -247,55 +220,66 @@ public class DisenarHogarActivity extends AppCompatActivity {
         pasilloLayout.addView(nombrePasillo);
 
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(pasillo.getAncho(), pasillo.getAlto());
-        params.leftMargin = 50;
-        params.topMargin = 50;
+        params.leftMargin = pasillo.getPosX();
+        params.topMargin = pasillo.getPosY();
         pasilloLayout.setLayoutParams(params);
         layoutHogar.addView(pasilloLayout);
         mapaPasillos.put(pasilloLayout, pasillo);
 
-        habilitarRedimensionadoYMovimiento(pasilloLayout);
+        habilitarRedimensionadoYMovimiento(pasilloLayout, pasillo);
 
         pasilloLayout.setOnTouchListener((v, event) -> {
             layoutSeleccionado = pasilloLayout;
             if (!scaleGestureDetector.isInProgress()) {
-                moverLayoutConUnDedo(v, event); // Movimiento con un dedo
+                moverLayoutConUnDedo(v, event, pasillo);
             }
-            scaleGestureDetector.onTouchEvent(event); // Redimensionar con dos dedos
+            scaleGestureDetector.onTouchEvent(event);
             return true;
         });
     }
 
-    // Método para habilitar el movimiento con un dedo
-    @SuppressLint("ClickableViewAccessibility")
-    private void moverLayoutConUnDedo(View v, MotionEvent event) {
+    private void moverLayoutConUnDedo(View v, MotionEvent event, Object objeto) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 dX = v.getX() - event.getRawX();
                 dY = v.getY() - event.getRawY();
                 break;
             case MotionEvent.ACTION_MOVE:
-                v.animate()
-                        .x(event.getRawX() + dX)
-                        .y(event.getRawY() + dY)
-                        .setDuration(0)
-                        .start();
+                float newX = event.getRawX() + dX;
+                float newY = event.getRawY() + dY;
+
+                newX = Math.max(0, Math.min(newX, layoutHogar.getWidth() - v.getWidth()));
+                newY = Math.max(0, Math.min(newY, layoutHogar.getHeight() - v.getHeight()));
+
+                v.animate().x(newX).y(newY).setDuration(0).start();
+
+                if (objeto instanceof Habitacion) {
+                    Habitacion habitacion = (Habitacion) objeto;
+                    habitacion.setPosX((int) newX);
+                    habitacion.setPosY((int) newY);
+                    guardarHabitacionEnFirebase(habitacion);
+                } else if (objeto instanceof Pasillo) {
+                    Pasillo pasillo = (Pasillo) objeto;
+                    pasillo.setPosX((int) newX);
+                    pasillo.setPosY((int) newY);
+                    guardarPasilloEnFirebase(pasillo);
+                }
                 break;
         }
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private void habilitarRedimensionadoYMovimiento(FrameLayout layout) {
+    private void habilitarRedimensionadoYMovimiento(FrameLayout layout, Object objeto) {
         layout.setOnTouchListener((v, event) -> {
             layoutSeleccionado = layout;
             if (!scaleGestureDetector.isInProgress()) {
-                moverLayoutConUnDedo(v, event); // Movimiento con un dedo
+                moverLayoutConUnDedo(v, event, objeto);
             }
-            scaleGestureDetector.onTouchEvent(event); // Redimensionar con dos dedos
+            scaleGestureDetector.onTouchEvent(event);
             return true;
         });
     }
 
-    // Clase para gestionar el redimensionado con dos dedos
     private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
@@ -307,6 +291,18 @@ public class DisenarHogarActivity extends AppCompatActivity {
                 params.width = newWidth;
                 params.height = newHeight;
                 layoutSeleccionado.setLayoutParams(params);
+
+                if (mapaHabitaciones.containsKey(layoutSeleccionado)) {
+                    Habitacion habitacion = mapaHabitaciones.get(layoutSeleccionado);
+                    habitacion.setAncho(newWidth);
+                    habitacion.setAlto(newHeight);
+                    guardarHabitacionEnFirebase(habitacion);
+                } else if (mapaPasillos.containsKey(layoutSeleccionado)) {
+                    Pasillo pasillo = mapaPasillos.get(layoutSeleccionado);
+                    pasillo.setAncho(newWidth);
+                    pasillo.setAlto(newHeight);
+                    guardarPasilloEnFirebase(pasillo);
+                }
             }
             return true;
         }
@@ -318,82 +314,17 @@ public class DisenarHogarActivity extends AppCompatActivity {
         layoutDatosHabitaciones.addView(datosHabitacion);
     }
 
-    private void enviarDatosHabitacionAWorker(Habitacion habitacion) {
-        Data inputData = new Data.Builder()
-                .putString("nombre", habitacion.getNombre())
-                .putInt("consumoEnergetico", habitacion.getConsumoEnergetico())
-                .putString("color", habitacion.getColor())
-                .build();
+    private void guardarHabitacionEnFirebase(Habitacion habitacion) {
+        Map<String, Object> habitacionData = new HashMap<>();
+        habitacionData.put("nombre", habitacion.getNombre());
+        habitacionData.put("consumoEnergetico", habitacion.getConsumoEnergetico());
+        habitacionData.put("color", habitacion.getColor());
+        habitacionData.put("posX", habitacion.getPosX());
+        habitacionData.put("posY", habitacion.getPosY());
+        habitacionData.put("ancho", habitacion.getAncho());
+        habitacionData.put("alto", habitacion.getAlto());
 
-        OneTimeWorkRequest workRequest = new OneTimeWorkRequest.Builder(HomeDataWorker.class)
-                .setInputData(inputData)
-                .build();
-
-        WorkManager.getInstance(this).enqueue(workRequest);
-
-    }
-
-    private void enviarDatosPasilloAWorker(Pasillo pasillo) {
-        Data inputData = new Data.Builder()
-                .putString("nombre", pasillo.getNombre())
-                .putString("color", pasillo.getColor())
-                .build();
-
-        OneTimeWorkRequest workRequest = new OneTimeWorkRequest.Builder(HomeDataWorker.class)
-                .setInputData(inputData)
-                .build();
-
-        WorkManager.getInstance(this).enqueue(workRequest);
-        guardarPasilloEnFirebase(pasillo);
-    }
-
-    private void cargarElementosDesdeFirebase() {
-        // Cargar habitaciones
-        db.collection("habitaciones").get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                for (QueryDocumentSnapshot document : task.getResult()) {
-                    String nombre = document.getString("nombre");
-                    Long consumoLong = document.getLong("consumoEnergetico");
-                    String color = document.getString("color");
-
-                    int consumoEnergetico = (consumoLong != null) ? consumoLong.intValue() : 0;
-
-                    if (nombre != null && color != null) {
-                        Habitacion habitacion = new Habitacion(nombre, consumoEnergetico, color);
-                        habitaciones.add(habitacion);
-                        agregarHabitacionVisual(habitacion);
-                    }
-                }
-            }
-        });
-
-        // Cargar pasillos
-        db.collection("pasillos").get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                for (QueryDocumentSnapshot document : task.getResult()) {
-                    String nombre = document.getString("nombre");
-                    Long anchoLong = document.getLong("ancho");
-                    Long altoLong = document.getLong("alto");
-                    String color = document.getString("color");
-                    Boolean esHorizontal = document.getBoolean("esHorizontal");
-
-                    int ancho = (anchoLong != null) ? anchoLong.intValue() : 100;
-                    int alto = (altoLong != null) ? altoLong.intValue() : 500;
-
-                    if (nombre != null && color != null && esHorizontal != null) {
-                        Pasillo pasillo = new Pasillo(nombre, ancho, alto, color, esHorizontal);
-                        pasillos.add(pasillo);
-                        agregarPasilloVisual(pasillo);
-                    }
-                }
-            }
-        });
-    }
-
-
-    private int generarConsumoSimulado() {
-        Random random = new Random();
-        return random.nextInt(500) + 100;
+        db.collection("habitaciones").document(habitacion.getNombre()).set(habitacionData);
     }
 
     private void guardarPasilloEnFirebase(Pasillo pasillo) {
@@ -403,38 +334,86 @@ public class DisenarHogarActivity extends AppCompatActivity {
         pasilloData.put("alto", pasillo.getAlto());
         pasilloData.put("color", pasillo.getColor());
         pasilloData.put("esHorizontal", pasillo.esHorizontal());
+        pasilloData.put("posX", pasillo.getPosX());
+        pasilloData.put("posY", pasillo.getPosY());
 
-        db.collection("pasillos")
-                .add(pasilloData)
-                .addOnSuccessListener(documentReference -> {
-                    // Puedes manejar una acción cuando se guarde exitosamente
-                    System.out.println("Pasillo guardado con ID: " + documentReference.getId());
-                })
-                .addOnFailureListener(e -> {
-                    // Maneja el error si falla el guardado
-                    System.out.println("Error guardando pasillo: " + e.getMessage());
-                });
+        db.collection("pasillos").document(pasillo.getNombre()).set(pasilloData);
     }
 
-    private void guardarHabitacionEnFirebase(Habitacion habitacion) {
-        Map<String, Object> habitacionData = new HashMap<>();
-        habitacionData.put("nombre", habitacion.getNombre());
-        habitacionData.put("consumoEnergetico", habitacion.getConsumoEnergetico());
-        habitacionData.put("color", habitacion.getColor());
+    private void cargarElementosDesdeFirebase() {
+        db.collection("habitaciones").get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    String nombre = document.getString("nombre");
+                    Long consumoLong = document.getLong("consumoEnergetico");
+                    String color = document.getString("color");
+                    Long posX = document.getLong("posX");
+                    Long posY = document.getLong("posY");
+                    Long anchoLong = document.getLong("ancho");
+                    Long altoLong = document.getLong("alto");
 
-        db.collection("habitaciones")
-                .add(habitacionData)
-                .addOnSuccessListener(documentReference -> {
-                    // Acción después de guardar la habitación
-                    System.out.println("Habitación guardada con ID: " + documentReference.getId());
-                })
-                .addOnFailureListener(e -> {
-                    // Maneja el error si falla el guardado
-                    System.out.println("Error guardando habitación: " + e.getMessage());
-                });
+                    int consumoEnergetico = (consumoLong != null) ? consumoLong.intValue() : 0;
+                    int ancho = (anchoLong != null) ? anchoLong.intValue() : 300;
+                    int alto = (altoLong != null) ? altoLong.intValue() : 300;
+
+                    if (nombre != null && color != null && posX != null && posY != null) {
+                        Habitacion habitacion = new Habitacion(nombre, consumoEnergetico, color);
+                        habitacion.setPosX(posX.intValue());
+                        habitacion.setPosY(posY.intValue());
+                        habitacion.setAncho(ancho);
+                        habitacion.setAlto(alto);
+                        habitaciones.add(habitacion);
+                        agregarHabitacionVisual(habitacion);
+                    }
+                }
+            }
+        });
+
+        db.collection("pasillos").get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    String nombre = document.getString("nombre");
+                    Long anchoLong = document.getLong("ancho");
+                    Long altoLong = document.getLong("alto");
+                    String color = document.getString("color");
+                    Boolean esHorizontal = document.getBoolean("esHorizontal");
+                    Long posX = document.getLong("posX");
+                    Long posY = document.getLong("posY");
+
+                    int ancho = (anchoLong != null) ? anchoLong.intValue() : 100;
+                    int alto = (altoLong != null) ? altoLong.intValue() : 500;
+
+                    if (nombre != null && color != null && esHorizontal != null && posX != null && posY != null) {
+                        Pasillo pasillo = new Pasillo(nombre, ancho, alto, color, esHorizontal);
+                        pasillo.setPosX(posX.intValue());
+                        pasillo.setPosY(posY.intValue());
+                        pasillos.add(pasillo);
+                        agregarPasilloVisual(pasillo);
+                    }
+                }
+            }
+        });
     }
 
+    private void iniciarActualizacionConsumo() {
+        Handler handler = new Handler();
+        Runnable actualizarConsumo = new Runnable() {
+            @Override
+            public void run() {
+                for (Habitacion habitacion : habitaciones) {
+                    habitacion.setConsumoEnergetico(generarConsumoSimulado());
+                    guardarHabitacionEnFirebase(habitacion);
+                }
+                handler.postDelayed(this, 5000);
+            }
+        };
+        handler.post(actualizarConsumo);
+    }
+
+    private int generarConsumoSimulado() {
+        Random random = new Random();
+        return random.nextInt(500) + 100;
+    }
 }
-
 
 
