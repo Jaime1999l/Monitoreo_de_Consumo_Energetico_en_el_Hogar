@@ -27,19 +27,23 @@ import java.util.concurrent.Executors;
 public class PantallaPrincipal extends AppCompatActivity {
 
     private DrawerLayout drawerLayout;
-    private ExecutorService executorService;
+    private ExecutorService executorService; //Para el manejo de hilos
     private FirebaseFirestore db;
     private Map<String, Integer> habitacionesConsumo;
     private Map<String, Map<String, Integer>> energyUsage;  // Para almacenar consumos de luz, electrodomésticos, calefacción
 
     private Random random;
 
+    // Flags para controlar los hilos
+    private volatile boolean isUpdatingConsumo = true; // Variables volatiles para que los hilos tengan una visibilidad inmediata de esta variable, esto se hace posible debido a que la lectura/escritura de esta variable se realiza sobre la memoria principal direcamente y no son guardadas en la cache del procesador
+    private volatile boolean isUpdatingEnergyUsage = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Inicializar Firebase y Mapas de datos
+        // Inicializamos Firebase y los Mapas de datos
         db = FirebaseFirestore.getInstance();
         habitacionesConsumo = new HashMap<>();
         energyUsage = new HashMap<>();
@@ -48,21 +52,21 @@ public class PantallaPrincipal extends AppCompatActivity {
         // Crear un pool de hilos para ejecutar tareas en segundo plano
         executorService = Executors.newFixedThreadPool(2);
 
-        // Ejecutar tareas en segundo plano
-        runBackgroundTasks();
+        // Ejecutamos las tareas en segundo plano
+        runBackgroundTasksConsumo();
+        runBackgroundTasksEnergy();
 
-        // Saludo personalizado
         TextView greetingTextView = findViewById(R.id.greeting_text_view);
         greetingTextView.setText("¡Bienvenido a la aplicación de monitoreo del hogar!");
 
-        // Imagen centrada
+        // Imagen
         ImageView imageView = findViewById(R.id.home_image);
         imageView.setImageResource(R.drawable.hogar);
 
-        // Configuración del menú desplegable (LinearLayout)
+        // Menu desplegable
         drawerLayout = findViewById(R.id.drawer_layout);
 
-        // Botón para abrir el menú
+        // Menu
         Button openMenuButton = findViewById(R.id.open_menu_button);
         openMenuButton.setOnClickListener(v -> drawerLayout.openDrawer(findViewById(R.id.menu_layout)));
 
@@ -75,6 +79,7 @@ public class PantallaPrincipal extends AppCompatActivity {
         // Opción del menú: Diseñar Hogar
         TextView navDesignHome = findViewById(R.id.nav_design_home);
         navDesignHome.setOnClickListener(v -> {
+            detenerHiloCosumo(); // Detenemos el hilo correspondiente al ejecutarse otra actividad, de esta manera cedemos el manejo de los datos a la propia actividad
             Intent intent = new Intent(PantallaPrincipal.this, DisenarHogarActivity.class);
             startActivity(intent);
             drawerLayout.closeDrawers(); // Cerrar el menú después de la selección
@@ -91,20 +96,22 @@ public class PantallaPrincipal extends AppCompatActivity {
         // Opción del menú: Monitorear Dispositivos Consumidores
         TextView navDeviceMonitoring = findViewById(R.id.nav_device_monitoring);
         navDeviceMonitoring.setOnClickListener(v -> {
+            detenerHiloEnergy();
             Intent intent = new Intent(PantallaPrincipal.this, EnergyMonitorActivity.class);
             startActivity(intent);
             drawerLayout.closeDrawers(); // Cerrar el menú después de la selección
         });
     }
 
-    private void runBackgroundTasks() {
-        // Ejecutar la recolección de datos de las habitaciones y de los dispositivos de energía en segundo plano
+    private void runBackgroundTasksConsumo() {
         executorService.execute(this::collectDesignHomeData);
+    }
+    private void runBackgroundTasksEnergy() {
         executorService.execute(this::collectEnergyMonitorData);
     }
 
     private void collectDesignHomeData() {
-        // Obtener datos de consumo para las habitaciones desde Firebase (colección "habitaciones")
+        // Obtenemos los datos de consumo para las habitaciones desde Firebase (colección "habitaciones")
         db.collection("habitaciones").get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 for (QueryDocumentSnapshot document : task.getResult()) {
@@ -131,21 +138,21 @@ public class PantallaPrincipal extends AppCompatActivity {
                     Long consumoCalefaccion = document.getLong("calefaccion");
 
                     if (consumoLuz != null && consumoElectrodomesticos != null && consumoCalefaccion != null) {
-                        String dispositivo = document.getId();  // Usar el ID del documento como identificador
+                        String dispositivo = document.getId();  // Usamos el ID del documento como identificador
 
-                        // Crear un mapa para almacenar los consumos por dispositivo
+                        // Creamos un mapa para almacenar los consumos por dispositivo
                         Map<String, Integer> consumos = new HashMap<>();
                         consumos.put("luz", consumoLuz.intValue());
                         consumos.put("electrodomesticos", consumoElectrodomesticos.intValue());
                         consumos.put("calefaccion", consumoCalefaccion.intValue());
 
-                        // Almacenar los datos en el mapa energyUsage
+                        // Almacenamos los datos en el mapa energyUsage
                         energyUsage.put(dispositivo, consumos);
                     } else {
                         Log.e("Firebase", "Error: faltan datos en un documento de energyUsage.");
                     }
                 }
-                // Iniciar la actualización periódica de energyUsage
+                // Actualizacion periodica de energyUsage
                 startEnergyUsageUpdate();
             } else {
                 Log.e("Firebase", "Error al obtener datos de energyUsage: ", task.getException());
@@ -157,14 +164,14 @@ public class PantallaPrincipal extends AppCompatActivity {
 
     private void startConsumoUpdate() {
         executorService.execute(() -> {
-            while (true) {
+            while (isUpdatingConsumo) {
                 for (Map.Entry<String, Integer> entry : habitacionesConsumo.entrySet()) {
                     int nuevoConsumo = entry.getValue() + random.nextInt(10) - 5; // Cambios aleatorios
                     habitacionesConsumo.put(entry.getKey(), Math.max(nuevoConsumo, 0)); // Asegurar que no sea negativo
 
                     Log.d("Consumo Habitacion", entry.getKey() + ": " + nuevoConsumo + " kWh");
 
-                    // Actualizar los datos de la habitación en Firebase
+                    // Actualizacion de los datos en Firebase
                     Map<String, Object> dataUpdate = new HashMap<>();
                     dataUpdate.put("consumoEnergetico", nuevoConsumo);
                     db.collection("habitaciones").document(entry.getKey()).update(dataUpdate)
@@ -172,7 +179,7 @@ public class PantallaPrincipal extends AppCompatActivity {
                             .addOnFailureListener(e -> Log.e("Firebase", "Error al actualizar el consumo", e));
                 }
                 try {
-                    Thread.sleep(5000);  // Pausa de 5 segundos antes de la siguiente actualización
+                    Thread.sleep(5000);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
@@ -181,15 +188,19 @@ public class PantallaPrincipal extends AppCompatActivity {
     }
 
     private void startEnergyUsageUpdate() {
-        // Ejecutar las actualizaciones de consumo de energía en segundo plano
+        // Inicia una tarea en segundo plano
         executorService.execute(() -> {
             try {
-                while (true) {
+                while (isUpdatingEnergyUsage) {
+
+                    // Recorre cada entrada del mapa de energyUsage. Cada entrada contiene un dispositivo como clave de tipo String
+                    // y un mapa de consumos (Map<String, Integer>) como valor. Este mapa de consumos guarda los valores de
+                    // luz, electrodomesticos y calefaccion
                     for (Map.Entry<String, Map<String, Integer>> entry : energyUsage.entrySet()) {
                         String dispositivo = entry.getKey();
                         Map<String, Integer> consumos = entry.getValue();
 
-                        // Actualizar cada campo de consumo
+                        // Actualizacion de cada campo de consumo
                         int nuevoConsumoLuz = consumos.get("luz") + random.nextInt(10) - 5;
                         int nuevoConsumoElectrodomesticos = consumos.get("electrodomesticos") + random.nextInt(10) - 5;
                         int nuevoConsumoCalefaccion = consumos.get("calefaccion") + random.nextInt(10) - 5;
@@ -199,7 +210,7 @@ public class PantallaPrincipal extends AppCompatActivity {
                         consumos.put("electrodomesticos", Math.max(nuevoConsumoElectrodomesticos, 0));
                         consumos.put("calefaccion", Math.max(nuevoConsumoCalefaccion, 0));
 
-                        // Convertir el mapa a Map<String, Object> para Firebase
+                        // Convertiremos el mapa a Map<String, Object> para Firebase
                         Map<String, Object> consumosObject = new HashMap<>();
                         consumosObject.put("luz", consumos.get("luz"));
                         consumosObject.put("electrodomesticos", consumos.get("electrodomesticos"));
@@ -210,7 +221,7 @@ public class PantallaPrincipal extends AppCompatActivity {
                                 .addOnSuccessListener(aVoid -> Log.d("Firebase", "Consumo actualizado para " + dispositivo))
                                 .addOnFailureListener(e -> Log.e("Firebase", "Error al actualizar el consumo", e));
                     }
-                    // Pausa de 5 segundos antes de la próxima actualización
+                    // Pausamos 5 segundos antes de la proxima actualizacion
                     Thread.sleep(5000);
                 }
             } catch (InterruptedException e) {
@@ -219,6 +230,12 @@ public class PantallaPrincipal extends AppCompatActivity {
         });
     }
 
+    private void detenerHiloCosumo() {
+        isUpdatingConsumo = false;
+    }
+    private void detenerHiloEnergy() {
+        isUpdatingEnergyUsage = false;
+    }
 
     @Override
     protected void onDestroy() {
