@@ -1,4 +1,4 @@
-package com.example.monitoreo_de_consumo_energtico_en_el_hogar.activity;
+package com.example.monitoreo_de_consumo_energtico_en_el_hogar.monitor_hogar_main.activity;
 
 import android.annotation.SuppressLint;
 import android.graphics.Color;
@@ -19,8 +19,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.monitoreo_de_consumo_energtico_en_el_hogar.R;
-import com.example.monitoreo_de_consumo_energtico_en_el_hogar.domain.Habitacion;
-import com.example.monitoreo_de_consumo_energtico_en_el_hogar.domain.Pasillo;
+import com.example.monitoreo_de_consumo_energtico_en_el_hogar.monitor_hogar_main.domain.Habitacion;
+import com.example.monitoreo_de_consumo_energtico_en_el_hogar.monitor_hogar_main.domain.Pasillo;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 

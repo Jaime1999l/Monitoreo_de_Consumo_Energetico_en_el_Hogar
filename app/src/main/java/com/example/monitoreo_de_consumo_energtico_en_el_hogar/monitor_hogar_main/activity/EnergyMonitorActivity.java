@@ -1,4 +1,4 @@
-package com.example.monitoreo_de_consumo_energtico_en_el_hogar.activity;
+package com.example.monitoreo_de_consumo_energtico_en_el_hogar.monitor_hogar_main.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.work.OneTimeWorkRequest;
@@ -13,7 +13,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.monitoreo_de_consumo_energtico_en_el_hogar.R;
-import com.example.monitoreo_de_consumo_energtico_en_el_hogar.data.EnergyDataWorker;
+import com.example.monitoreo_de_consumo_energtico_en_el_hogar.monitor_hogar_main.data.EnergyDataWorker;
 
 import java.util.Random;
 

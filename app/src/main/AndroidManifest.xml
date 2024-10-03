@@ -10,15 +10,15 @@
         android:theme="@style/Theme.Monitoreo_de_Consumo_Energético_en_el_Hogar">
 
         <activity
-            android:name=".activity.EnergyMonitorActivity"
+            android:name=".monitor_hogar_main.activity.EnergyMonitorActivity"
             android:exported="false" />
 
         <activity
-            android:name=".activity.DisenarHogarActivity"
+            android:name=".monitor_hogar_main.activity.DisenarHogarActivity"
             android:exported="false"/>
 
         <activity
-            android:name=".PantallaPrincipal"
+            android:name=".monitor_hogar_main.PantallaPrincipal"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -1,4 +1,4 @@
-package com.example.monitoreo_de_consumo_energtico_en_el_hogar;
+package com.example.monitoreo_de_consumo_energtico_en_el_hogar.monitor_hogar_main;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,10 +11,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.monitoreo_de_consumo_energtico_en_el_hogar.R;
-import com.example.monitoreo_de_consumo_energtico_en_el_hogar.activity.DisenarHogarActivity;
-import com.example.monitoreo_de_consumo_energtico_en_el_hogar.activity.EnergyMonitorActivity;
-import com.example.monitoreo_de_consumo_energtico_en_el_hogar.activity.RoomMonitorActivity;
-import com.google.firebase.firestore.DocumentReference;
+import com.example.monitoreo_de_consumo_energtico_en_el_hogar.monitor_hogar_main.activity.DisenarHogarActivity;
+import com.example.monitoreo_de_consumo_energtico_en_el_hogar.monitor_hogar_main.activity.EnergyMonitorActivity;
+import com.example.monitoreo_de_consumo_energtico_en_el_hogar.monitor_hogar_main.activity.RoomMonitorActivity;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
