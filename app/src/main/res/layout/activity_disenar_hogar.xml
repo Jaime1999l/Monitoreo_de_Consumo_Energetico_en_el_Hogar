@@ -2,30 +2,51 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     android:orientation="vertical"
     android:padding="16dp">
+
+    <!-- Título de la aplicación o actividad -->
+    <TextView
+        android:id="@+id/titulo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@color/colorPrimary"
+        android:gravity="center"
+        android:padding="16dp"
+        android:text="@string/titulo_habitacion_pasillo"
+        android:textColor="#FFFFFF"
+        android:textSize="26sp"
+        android:textStyle="bold" />
 
     <!-- Botones para agregar habitaciones y pasillos -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_gravity="center"
+        android:layout_marginBottom="16dp"
         android:gravity="center"
-        android:layout_marginBottom="16dp">
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/btn_agregar_habitacion"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/habitaci_n" />
+            android:layout_weight="1"
+            android:backgroundTint="@color/colorAccent"
+            android:text="@string/habitaci_n"
+            android:textColor="@android:color/white" />
 
         <Button
             android:id="@+id/btn_agregar_pasillo"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/colorAccent"
             android:text="@string/pasillo"
-            android:layout_marginStart="16dp" />
+            android:textColor="@android:color/white" />
 
     </LinearLayout>
 
@@ -33,13 +54,13 @@
     <FrameLayout
         android:id="@+id/layout_hogar"
         android:layout_width="match_parent"
-        android:layout_height="600dp"
-        android:background="#f0f0f0"
+        android:layout_height="400dp"
         android:layout_gravity="center"
-        android:layout_marginBottom="16dp">
-    </FrameLayout>
+        android:layout_marginBottom="16dp"
+        android:background="@color/lightGray"
+        android:elevation="4dp"
+        android:padding="16dp" />
 
-    <!-- ScrollView para datos de las habitaciones y pasillos -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -49,19 +70,25 @@
             android:id="@+id/layout_datos_habitaciones"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:elevation="4dp"
             android:orientation="vertical"
-            android:padding="8dp"
-            android:background="#E0E0E0">
+            android:padding="8dp">
 
+            <!-- Sección de datos de consumo -->
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:paddingBottom="8dp"
                 android:text="@string/datos_de_consumo_de_las_habitaciones"
+                android:textColor="@color/primaryTextColor"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
-            <!-- Aquí se añadirán dinámicamente los datos de habitaciones y pasillos -->
+            <!-- Aqui se añadiran dinámicamente los datos de habitaciones y pasillos -->
         </LinearLayout>
     </ScrollView>
+
 
 </LinearLayout>
 

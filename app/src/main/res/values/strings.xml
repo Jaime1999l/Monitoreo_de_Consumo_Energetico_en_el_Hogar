@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Monitoreo_de_Consumo_Energético_en_el_Hogar</string>
-    <string name="datos_de_consumo_de_las_habitaciones">Datos de consumo de las habitaciones:</string>
+    <string name="datos_de_consumo_de_las_habitaciones"> Consumo energetico de las habitaciones:</string>
     <string name="pasillo">Pasillo</string>
     <string name="habitaci_n">Habitación</string>
+    <string name="info_habitacion_pasillo">Por favor, selecciona una habitación o un pasillo para agregar al diseño de tu hogar.</string>
+    <string name="titulo_habitacion_pasillo">DISEÑO DEL HOGAR</string>
 </resources>
