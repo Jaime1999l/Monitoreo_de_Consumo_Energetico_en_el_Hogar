@@ -69,25 +69,36 @@ public class DisenarHogarActivity extends AppCompatActivity {
     }
 
     private void mostrarDialogoNuevaHabitacion() {
+        // Cuadro de dialogo
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        // Titulo del cuadro de dialogo
         builder.setTitle("Nueva Habitación");
 
+
+        // Creamos un LinearLayout el cual sera el contenedor del contenido del dialogo
+        // este se establece en orientacion vertical para que los elementos se apilen verticalmente.
         LinearLayout dialogLayout = new LinearLayout(this);
         dialogLayout.setOrientation(LinearLayout.VERTICAL);
-        dialogLayout.setPadding(50, 40, 50, 10);
+        dialogLayout.setPadding(50, 40, 50, 10); // Margenes internos (padding).
 
+        // Creamos un campo de "entrada de texto" para que el usuario ingrese el nombre de la nueva habitacion que se va a crear
         EditText inputNombre = new EditText(this);
-        inputNombre.setHint("Nombre de la habitación");
+        inputNombre.setHint("Nombre de la habitación"); // Muestra un texto de sugerencia
 
+        // Creamos otro LinearLayout para los botones de selección de color, este layout sera horizontal,
+        // de modo que los botones de colores se alineen uno al lado del otro
         LinearLayout coloresLayout = new LinearLayout(this);
         coloresLayout.setOrientation(LinearLayout.HORIZONTAL);
-        coloresLayout.setGravity(Gravity.CENTER);
+        coloresLayout.setGravity(Gravity.CENTER); // Centramos los botones dentro del layout usando gravity
         coloresLayout.setPadding(0, 20, 0, 20);
 
+        // Array con colores
         int[] colores = {Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.MAGENTA, Color.CYAN};
+
 
         Button[] botonesColores = new Button[colores.length];
 
+        // Bucle para crear los botones de un color y agregarlos al layout de colores
         for (int i = 0; i < colores.length; i++) {
             botonesColores[i] = new Button(this);
             botonesColores[i].setBackgroundColor(colores[i]);
@@ -314,7 +325,7 @@ public class DisenarHogarActivity extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     private void mostrarDatosHabitacion() {
-        layoutDatosHabitaciones.removeAllViews();  // Limpia antes de agregar los datos actualizados
+        layoutDatosHabitaciones.removeAllViews();  // Limpiamos antes de agregar los datos actualizados
         TextView titulo = new TextView(this);
         titulo.setText("Datos de consumo de las habitaciones: \n");
         titulo.setTextSize(18);
@@ -385,7 +396,7 @@ public class DisenarHogarActivity extends AppCompatActivity {
                         agregarHabitacionVisual(habitacion);
                     }
                 }
-                mostrarDatosHabitacion();  // Llamamos a la actualización de datos después de cargar las habitaciones
+                mostrarDatosHabitacion();  // Llamamos a la actualizacion de datos despues de cargar las habitaciones
             }
         });
 
@@ -424,7 +435,7 @@ public class DisenarHogarActivity extends AppCompatActivity {
                     habitacion.setConsumoEnergetico(generarConsumoSimulado());
                     guardarHabitacionEnFirebase(habitacion);
                 }
-                mostrarDatosHabitacion();  // Llamamos a la actualización de datos en pantalla después de actualizar el consumo
+                mostrarDatosHabitacion();  // Llamamos a la actualizacion de datos en pantalla despues de actualizar el consumo
                 handler.postDelayed(this, 5000);
             }
         };

@@ -10,18 +10,16 @@ public class Pasillo {
     private int posX; // Posición X en el lienzo
     private int posY; // Posición Y en el lienzo
 
-    // Constructor para un pasillo con orientación por defecto
     public Pasillo(String nombre, String color) {
         this.nombre = nombre;
         this.color = color;
-        this.ancho = 300; // Ancho por defecto
-        this.alto = 100;  // Alto por defecto
-        this.esHorizontal = true; // Por defecto, horizontal
-        this.posX = 0; // Posición inicial X
-        this.posY = 0; // Posición inicial Y
+        this.ancho = 300;
+        this.alto = 100;
+        this.esHorizontal = true;
+        this.posX = 0;
+        this.posY = 0;
     }
 
-    // Constructor que acepta todos los parámetros, incluyendo orientación y posición
     public Pasillo(String nombre, int ancho, int alto, String color, boolean esHorizontal) {
         this.nombre = nombre;
         this.ancho = ancho;
@@ -32,7 +30,6 @@ public class Pasillo {
         this.posY = 0;
     }
 
-    // Getters y setters para las propiedades
     public String getNombre() {
         return nombre;
     }
