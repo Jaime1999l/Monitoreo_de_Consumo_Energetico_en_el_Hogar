@@ -20,7 +20,6 @@ public class Habitacion {
         this.color = color;
     }
 
-    // Constructor que acepta todos los parámetros
     public Habitacion(String nombre, int consumoEnergetico, String color, int ancho, int alto, int posX, int posY) {
         this.nombre = nombre;
         this.consumoEnergetico = consumoEnergetico;

@@ -30,7 +30,7 @@ public class EnergyMonitorActivity extends AppCompatActivity {
     private int totalElectrodomesticos = 0;
     private int totalCalefaccion = 0;
 
-    // Usamos un solo token único para todo el ciclo de vida de la actividad
+    // Usamos un solo token unico para todo el ciclo de vida de la actividad
     private String token;
 
     @SuppressLint("MissingInflatedId")
@@ -78,7 +78,6 @@ public class EnergyMonitorActivity extends AppCompatActivity {
         updateRunnable = new Runnable() {
             @Override
             public void run() {
-                // Cambios menores: generamos un valor aleatorio que se suma o resta
                 int luz = getUpdatedValue(progressBarLuz.getProgress());
                 int electrodomesticos = getUpdatedValue(progressBarElectrodomesticos.getProgress());
                 int calefaccion = getUpdatedValue(progressBarCalefaccion.getProgress());
@@ -98,7 +97,6 @@ public class EnergyMonitorActivity extends AppCompatActivity {
     }
 
     private int getUpdatedValue(int current) {
-        // Cambios menores: incrementamos o decrementamos en un rango pequeño
         int change = random.nextInt(11) - 5; // Rango de -5 a +5
         int newValue = current + change;
         return Math.max(30, Math.min(120, newValue)); // Asegurar que esté en el rango 30 a 120

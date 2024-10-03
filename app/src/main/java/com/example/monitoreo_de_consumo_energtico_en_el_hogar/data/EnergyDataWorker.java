@@ -22,20 +22,20 @@ public class EnergyDataWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        // Obtener los datos pasados desde la Activity
+        // Obtenemos los datos pasados desde la Activity
         int luz = getInputData().getInt("luz", 0);
         int electrodomesticos = getInputData().getInt("electrodomesticos", 0);
         int calefaccion = getInputData().getInt("calefaccion", 0);
         String token = getInputData().getString("token");
 
-        // Crear un mapa de datos para actualizar en Firestore
+        // Creamos un mapa de datos para actualizar en Firestore
         Map<String, Object> energyData = new HashMap<>();
         energyData.put("luz", luz);
         energyData.put("electrodomesticos", electrodomesticos);
         energyData.put("calefaccion", calefaccion);
         energyData.put("timestamp", System.currentTimeMillis());
 
-        // Comprobar si el documento ya existe
+        // Comprobamos si el documento ya existe
         db.collection("energyUsage").document(token)
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
@@ -46,7 +46,7 @@ public class EnergyDataWorker extends Worker {
                                 .addOnSuccessListener(aVoid -> Log.d("EnergyDataWorker", "Datos actualizados con éxito"))
                                 .addOnFailureListener(e -> Log.e("EnergyDataWorker", "Error al actualizar los datos", e));
                     } else {
-                        // Si no existe, crea el documento
+                        // Si no existe, se crea el documento
                         db.collection("energyUsage").document(token)
                                 .set(energyData)
                                 .addOnSuccessListener(aVoid -> Log.d("EnergyDataWorker", "Documento creado y datos guardados"))
