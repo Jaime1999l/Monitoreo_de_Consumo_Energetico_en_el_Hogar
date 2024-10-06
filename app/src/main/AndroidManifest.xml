@@ -1,25 +1,29 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.monitoreo_de_consumo_energtico_en_el_hogar">
+          package="com.example.monitoreo_de_consumo_energtico_en_el_hogar">
 
     <application
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
-        android:theme="@style/Theme.Monitoreo_de_Consumo_Energético_en_el_Hogar">
+            android:allowBackup="true"
+            android:icon="@mipmap/ic_launcher"
+            android:label="@string/app_name"
+            android:roundIcon="@mipmap/ic_launcher_round"
+            android:supportsRtl="true"
+            android:theme="@style/Theme.Monitoreo_de_Consumo_Energético_en_el_Hogar">
 
         <activity
-            android:name=".activity.EnergyMonitorActivity"
-            android:exported="false" />
+                android:name=".monitor_hogar_main.activity.EnergyMonitorActivity"
+                android:exported="false" />
 
         <activity
-            android:name=".activity.DisenarHogarActivity"
-            android:exported="false"/>
+                android:name=".monitor_hogar_main.activity.DisenarHogarActivity"
+                android:exported="false"/>
 
         <activity
-            android:name=".PantallaPrincipal"
-            android:exported="true">
+                android:name=".monitor_hogar_main.activity.RoomMonitorActivity"
+                android:exported="false"/>
+
+        <activity
+                android:name=".monitor_hogar_main.PantallaPrincipal"
+                android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
