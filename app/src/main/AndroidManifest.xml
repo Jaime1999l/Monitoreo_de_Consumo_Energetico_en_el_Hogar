@@ -18,6 +18,10 @@
             android:exported="false"/>
 
         <activity
+            android:name=".monitor_hogar_main.activity.RoomMonitorActivity"
+            android:exported="false"/>
+
+        <activity
             android:name=".monitor_hogar_main.PantallaPrincipal"
             android:exported="true">
             <intent-filter>
