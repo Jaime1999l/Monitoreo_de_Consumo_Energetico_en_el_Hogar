@@ -1,4 +1,4 @@
-package com.example.monitoreo_de_consumo_energtico_en_el_hogar.monitor_hogar_main.activity;
+package com.example.monitoreo_de_consumo_energtico_en_el_hogar.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
