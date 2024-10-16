@@ -1,0 +1,32 @@
+@startuml
+actor Usuario
+
+rectangle "Monitoreo de Consumo Energético" {
+
+  usecase "Ver datos de consumo por habitación" as UC1
+  usecase "Ver datos de consumo por dispositivo" as UC2
+  usecase "Agregar habitación" as UC3
+  usecase "Agregar pasillo" as UC4
+  usecase "Monitorear gráficos de consumo" as UC5
+  usecase "Actualizar consumo en tiempo real" as UC6
+  usecase "Enviar datos a Firebase" as UC7
+
+  Usuario --> UC1
+  Usuario --> UC2
+  Usuario --> UC3
+  Usuario --> UC4
+  Usuario --> UC5
+}
+
+rectangle "Procesos en Segundo Plano" {
+  usecase "Recolectar datos de Firebase" as UC8
+  usecase "Actualizar datos de consumo en Firebase" as UC9
+  usecase "Gestión de consumo con hilos" as UC10
+}
+
+UC6 --> UC5 : Actualiza los gráficos
+UC7 --> UC9 : Enviar actualizaciones
+UC9 --> UC8 : Actualiza desde Firebase
+UC10 --> UC8 : Recopila datos periódicos
+
+@enduml

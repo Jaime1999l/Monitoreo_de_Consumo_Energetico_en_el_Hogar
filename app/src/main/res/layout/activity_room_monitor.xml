@@ -4,18 +4,36 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    android:gravity="center">
+    android:gravity="center"
+    android:background="@android:color/white">
 
     <TextView
         android:id="@+id/promedioTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Promedio de Consumo: 0 kWh"
-        android:textSize="18sp"
-        android:layout_marginBottom="20dp"/>
+        android:textSize="24sp"
+        android:textColor="@android:color/black"
+        android:layout_marginBottom="24dp"
+        android:gravity="center"
+        android:fontFamily="sans-serif-medium"/>
 
     <com.example.monitoreo_de_consumo_energtico_en_el_hogar.monitor_hogar_main.view.GaussChartView
         android:id="@+id/gaussChartView"
         android:layout_width="match_parent"
-        android:layout_height="400dp"/>
+        android:layout_height="400dp"
+        android:background="@android:color/white"
+        android:elevation="4dp"
+        android:padding="16dp" />
+
+    <TextView
+        android:id="@+id/indicadorMaximo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Máximo Consumo: 200 kWh"
+        android:textSize="18sp"
+        android:textColor="#FF6200EE"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:fontFamily="sans-serif-medium"/>
 </LinearLayout>
